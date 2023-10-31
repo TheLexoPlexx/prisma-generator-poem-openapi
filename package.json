@@ -1,0 +1,31 @@
+{
+  "name": "prisma-generator-poem-openapi",
+  "version": "0.1.0",
+  "description": "Prisma Generator for the Rust Framework Poem to generate OpenApi-Structs and implementations.",
+  "bin": "./dist/generator.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "dev:watch": "tsc -p . --watch",
+    "dev": "tsc -p . && npm run prisma:generate",
+    "migrate:dev": "prisma migrate dev --preview-feature",
+    "migrate:dev:create": "prisma migrate dev --create-only --preview-feature",
+    "migrate:reset": "prisma migrate reset --preview-feature",
+    "migrate:deploy": "npx prisma migrate deploy --preview-feature",
+    "migrate:status": "npx prisma migrate status --preview-feature",
+    "migrate:resolve": "npx prisma migrate resolve --preview-feature",
+    "prisma:generate": "npx prisma generate"
+  },
+  "license": "CC-BY-NC-SA-4.0",
+  "dependencies": {
+    "@prisma/generator-helper": "4.13.0",
+    "@prisma/internals": "4.13.0",
+    "ts-toolbelt": "^9.6.0"
+  },
+  "devDependencies": {
+    "@prisma/client": "latest",
+    "@types/jest": "^29.2.4",
+    "@types/node": "14.17.0",
+    "prisma": "latest",
+    "typescript": "4.9.4"
+  }
+}

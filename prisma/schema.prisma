@@ -1,0 +1,74 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator poem {
+  provider = "node ./dist/generator.js"
+  output   = "./../../poem-openapi/src/"
+}
+
+model System {
+  id           String             @id @default(cuid())
+  label        String             @unique
+  parts        Serialnumberpart[]
+  order_number Int
+  order_list   Order              @relation(fields: [order_number], references: [order_number])
+}
+
+model Serialnumberpart {
+  serial  String @id
+  part_id String @map("edv_nummer")
+
+  // Zugehörigkeit zu einer Anlage
+  system    System? @relation(fields: [system_id], references: [id]) //Jedes Teil kann in einer Anlage verbaut sein, oder nicht
+  system_id String?
+
+  // Baugruppe/Hierarchie:
+  group     Serialnumberpart[] @relation("hierarchy") //wenn in Gruppe etwas eingetragen ist, dann ist es eine Baugruppe
+  parent    Serialnumberpart?  @relation("hierarchy", fields: [parent_id], references: [serial])
+  parent_id String?
+
+  // Zeiten
+  manufacturing_date DateTime?
+  shipping_date      DateTime?
+  installation_date  DateTime?
+}
+
+// ###################
+
+model Project {
+  id             String  @id @default(cuid())
+  project_number Int     @unique
+  factory        Factory @relation(fields: [id], references: [id])
+  order_list     Order[]
+}
+
+model Order {
+  order_number Int      @id
+  project      Project  @relation(fields: [project_id], references: [id])
+  project_id   String
+  plant_list   System[]
+}
+
+// ################### Kunde und Werk existiert, damit der GU übersprungen werden kann, trotzdem muss es ein Feld "GU" geben, damit getrackt werden kann, welcher von denen die meisten Probleme mit unseren Anlagen hat
+model FinalCustomer {
+  id           String    @id @default(cuid())
+  sap_id       String    @unique @default("0") // Anbindung an SAP, zu Entwicklungszwecken "0", das Feld ist absichtlich mit SAP benannt, damit hier nichts überschrieben werden muss beim Umzug auf IFS.
+  factory_list Factory[]
+  name         String    @unique
+  alias        String[]
+}
+
+model PrimeContractor {
+  id     String @id @default(cuid())
+  sap_id String @unique @default("0") // Anbindung an SAP, zu Entwicklungszwecken "0"
+}
+
+model Factory {
+  id          String        @id @default(cuid())
+  customer    FinalCustomer @relation(fields: [customer_id], references: [id])
+  customer_id String
+  name        String        @unique
+  projects    Project[]
+}
