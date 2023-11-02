@@ -12,7 +12,7 @@ model System {
   id           String             @id @default(cuid())
   label        String             @unique
   parts        Serialnumberpart[]
-  order_number Int
+  order_number String
   order_list   Order              @relation(fields: [order_number], references: [order_number])
 }
 
@@ -38,14 +38,16 @@ model Serialnumberpart {
 // ###################
 
 model Project {
-  id             String  @id @default(cuid())
-  project_number Int     @unique
-  factory        Factory @relation(fields: [id], references: [id])
-  order_list     Order[]
+  id             String @id @default(cuid())
+  project_number Int    @unique
+  description    String //Beschreibung, was da vor sich geht
+
+  factory    Factory @relation(fields: [id], references: [id])
+  order_list Order[]
 }
 
 model Order {
-  order_number Int      @id
+  order_number String   @id
   project      Project  @relation(fields: [project_id], references: [id])
   project_id   String
   plant_list   System[]
@@ -58,11 +60,6 @@ model FinalCustomer {
   factory_list Factory[]
   name         String    @unique
   alias        String[]
-}
-
-model PrimeContractor {
-  id     String @id @default(cuid())
-  sap_id String @unique @default("0") // Anbindung an SAP, zu Entwicklungszwecken "0"
 }
 
 model Factory {
