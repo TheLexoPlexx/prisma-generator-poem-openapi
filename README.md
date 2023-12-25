@@ -27,16 +27,19 @@ generator poem-openapi {
 3. Run `prisma generate` to generate the API-Requests
 
 ## Roadmap (in no particular order):
-- [ ] Create
+- [x] Create
+  - [ ] Better Error Messages?
 - [x] Read all
 - [ ] Read by Id
 - [ ] Update
 - [ ] Update single value
-- [ ] Delete
+- [ ] Delete single value
+- [ ] Additional options to opt out of certain actions and not generate those
 - [ ] Automatically log all granular changes or allow an option to do so (ideas welcome)
 - [x] Option: custom path for the generated files
 - [x] Option: custom name for the generated file
-- [ ] Automatic Testing 
+- [ ] Automatic Testing
+- [ ] Rust-Macros for smaller code
 
 ## License
 For now: CC-BY-NC-SA 4.0, might change in the future, idk.
