@@ -108,21 +108,27 @@ function generate_poem_openapi(
     let dbname = model.dbName || model.name
 
     api.push(`
-${oai(dbname.toLowerCase(), "get")}
-async fn get_${dbname.toLowerCase()}(&self, pool: Data<&PgPool>) -> Result<Json<Vec<${model.name}>>> {
-  let get = sqlx::query_as!(${model.name}, \"SELECT * FROM \\\"${dbname}\\\"\").fetch_all(pool.0).await.expect(\"Failed to get ${dbname}\");
-  Ok(Json(get))
-}`)
+    ${oai(dbname.toLowerCase(), "get")}
+    async fn get_${dbname.toLowerCase()}(&self, pool: Data<&PgPool>) -> Result<Json<Vec<${model.name}>>> {
+      let get = sqlx::query_as!(${model.name}, \"SELECT * FROM \\\"${dbname}\\\"\").fetch_all(pool.0).await.expect(\"Failed to get ${dbname}\");
+      Ok(Json(get))
+    }`)
 
     let primary = model.fields.filter(field => field.isId)[0].name //TODO: More than one identifier possible?
-    console.log(primary)
 
     api.push(`
-${oai(dbname.toLowerCase() + "/:" + primary, "get")}
-async fn get_${dbname.toLowerCase()}_by_id(&self, ${primary}: Path<String>, pool: Data<&PgPool>) -> Result<Json<Vec<${model.name}>>> {
-  let get = sqlx::query_as!(${model.name}, \"SELECT * FROM \\\"${dbname}\\\" WHERE ${primary} = $1\", &${primary}.0).fetch_all(pool.0).await.expect(\"Failed to get ${dbname}\");
-  Ok(Json(get))
-}`)
+    ${oai(dbname.toLowerCase() + "/:" + primary, "get")}
+    async fn get_${dbname.toLowerCase()}_by_id(&self, ${primary}: Path<String>, pool: Data<&PgPool>) -> Result<Json<Vec<${model.name}>>> {
+      let get = sqlx::query_as!(${model.name}, \"SELECT * FROM \\\"${dbname}\\\" WHERE ${primary} = $1\", &${primary}.0).fetch_all(pool.0).await.expect(\"Failed to get by id ${dbname}\");
+      Ok(Json(get))
+    }`)
+
+    api.push(`
+    ${oai(dbname.toLowerCase() + "/:" + primary, "delete")}
+    async fn delete_${dbname.toLowerCase()}_by_id(&self, ${primary}: Path<String>, pool: Data<&PgPool>) -> Result<Json<u64>> {
+    let get = sqlx::query!(\"DELETE FROM \\\"${dbname}\\\" WHERE ${primary} = $1\", &${primary}.0).execute(pool.0).await.expect(\"Failed to delete ${dbname}\").rows_affected();
+    Ok(Json(get))
+    }`)
 
     let filtered_fields = model.fields.filter(field => {
       return dmmf.datamodel.models.filter(m => m.name == field.type).length == 0
@@ -136,24 +142,24 @@ async fn get_${dbname.toLowerCase()}_by_id(&self, ${primary}: Path<String>, pool
     })
 
     api.push(`
-${oai(dbname.toLowerCase(), "post")}
-async fn post_${dbname.toLowerCase()}(
-    &self,
-    pool: Data<&PgPool>,
-    input: Json<${model.name}>,
-) -> Result<Json<String>> {
-  match sqlx::query("INSERT INTO \\\"${dbname}\\\" (${fields}) values (${field_numbers})")${binds.join("")}.execute(pool.0).await {
-  Ok(x) => {
-      println!("Inserted ${dbname}");
-      dbg!(x);
-      Ok(Json("ok".to_string()))
-    }
-    Err(e) => {
-      println!("Failed to insert ${dbname}: {}", e);
-      Err(InternalServerError(e))
-    }
-  }
-}`)
+    ${oai(dbname.toLowerCase(), "post")}
+    async fn post_${dbname.toLowerCase()}(
+        &self,
+        pool: Data<&PgPool>,
+        input: Json<${model.name}>,
+    ) -> Result<Json<String>> {
+      match sqlx::query("INSERT INTO \\\"${dbname}\\\" (${fields}) values (${field_numbers})")${binds.join("")}.execute(pool.0).await {
+      Ok(x) => {
+          println!("Inserted ${dbname}");
+          dbg!(x);
+          Ok(Json("ok".to_string()))
+        }
+        Err(e) => {
+          println!("Failed to insert ${dbname}: {}", e);
+          Err(InternalServerError(e))
+        }
+      }
+    }`)
 
   })
   api.push("}\n")

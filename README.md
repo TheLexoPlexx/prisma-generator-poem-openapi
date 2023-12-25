@@ -28,17 +28,19 @@ generator poem-openapi {
 
 ## Roadmap (in no particular order):
 - [x] Create
-  - [ ] Better Error Messages?
+  - [ ] Better Error Handling
 - [x] Read all
-- [ ] Read by Id
+- [x] Read by Id
 - [ ] Update
 - [ ] Update single value
-- [ ] Delete single value
+- [x] Delete single value
+  - [ ] Better Error Handling
 - [ ] Additional options to opt out of certain actions and not generate those
 - [ ] Automatically log all granular changes or allow an option to do so (ideas welcome)
 - [x] Option: custom path for the generated files
 - [x] Option: custom name for the generated file
 - [ ] Automatic Testing
+- [ ] Option: Change API name
 - [ ] Rust-Macros for smaller code
 
 ## License
