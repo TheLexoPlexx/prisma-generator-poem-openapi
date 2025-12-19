@@ -1,10 +1,12 @@
+# Archived
+
+This can be solved much better with rust's macros.
+
+------
+
 # Prisma Generator for Poem OpenAPI
 
 [[Poem OpenAPI](https://crates.io/crates/poem-openapi)] - [[Prisma](https://www.prisma.io/)]
-
-# --- WORK IN PROGRESS ---
-
-### If you somehow stumpled upon this, feel free to open a PR and contribute.
 
 ## What this is supposed to do:
 Create all useful API-Requests out of the box based on a Prisma-Schema, CRUD, Read-by-Id and maybe some others
